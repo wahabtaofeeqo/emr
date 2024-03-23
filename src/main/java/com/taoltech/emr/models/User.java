@@ -13,15 +13,17 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import lombok.Data;
+
 import java.util.Date;
 import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
-
 
 /**
  *
  * @author taoltech
  */
+@Data
 @Entity(name = "users")
 public class User {
     
@@ -33,18 +35,19 @@ public class User {
     private String name;
     
     @Column
-    private String username;
+    private String email;
     
     @Column
     private String password;
     
-    @OneToOne(optional = true)
+    @OneToOne
     private Role role;
     
     @CreationTimestamp
     @Temporal(value = TemporalType.TIMESTAMP)
     private Date createdAt;
     
+    @Column
     private Date updatedAt;
     
     @PreUpdate

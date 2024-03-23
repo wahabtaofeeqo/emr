@@ -4,6 +4,10 @@
  */
 package com.taoltech.emr.controllers;
 
+import com.taoltech.emr.responses.BaseResponse;
+import com.taoltech.emr.responses.OkResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,8 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class IndexController {
     
+    @Operation(
+        tags = "A",
+        summary = "System Heath check")
     @GetMapping("")
-    private String index() {
-        return "Hello World";
+    private ResponseEntity<?> index() {
+        BaseResponse res = new OkResponse("Hello World! Let's get started", null);
+        return ResponseEntity.ok().body(res);
     }
 }

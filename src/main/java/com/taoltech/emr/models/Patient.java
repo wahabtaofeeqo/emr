@@ -1,8 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.taoltech.emr.models;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import java.util.Date;
+import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,28 +13,28 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
-import java.util.Date;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.Data;
 
-/**
- *
- * @author taoltech
- */
-
-@Entity(name = "roles")
-public class Role {
+@Data
+@Entity(name = "patients")
+public class Patient {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
     @Column
-    private String name;
-    
-    @OneToOne(mappedBy = "role")
+    private Date dob;
+
+    @Column
+    private String gender;
+
+    @Column
+    private String address;
+
+    @OneToOne
     private User user;
-    
+
     @CreationTimestamp
     @Temporal(value = TemporalType.TIMESTAMP)
     private Date createdAt;
