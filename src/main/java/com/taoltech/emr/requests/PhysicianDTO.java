@@ -1,18 +1,14 @@
 package com.taoltech.emr.requests;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Past;
-import lombok.Data;
-import java.util.Date;
-
-import org.springframework.format.annotation.DateTimeFormat;
-
 import com.taoltech.emr.models.User;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+
 @Data
-public class PatientDTO {
-        
+public class PhysicianDTO {
+
     @NotBlank(message = "Name is required")
     private String name;
     
@@ -22,23 +18,19 @@ public class PatientDTO {
     
     @NotBlank(message = "Phone number is required")
     private String phone;
-
-    @Past(message = "DOB must be in the past")
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
-    private Date dob;
-
-    @NotBlank(message = "Email is required")
-    private String gender;
     
-    @NotBlank(message = "Phone number is required")
-    private String address;
+    @NotBlank(message = "Type is required")
+    private String type;
+     
+    @NotBlank(message = "Password is required")
+    private String password;
 
     public User toUser() {
         User user = new User();
         user.setName(name);
         user.setEmail(email);
         user.setPhone(phone);
-        user.setPassword(phone);
+        user.setPassword(password);
         
         //
         return user;

@@ -24,6 +24,9 @@ public class Patient {
     private UUID id;
 
     @Column
+    private String sn;
+    
+    @Column
     private Date dob;
 
     @Column

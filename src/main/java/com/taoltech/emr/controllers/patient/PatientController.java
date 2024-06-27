@@ -13,32 +13,27 @@ import com.taoltech.emr.repositories.RoleRepository;
 import com.taoltech.emr.repositories.UserRepository;
 import com.taoltech.emr.requests.PatientDTO;
 import com.taoltech.emr.requests.UpdatePatientDTO;
-import com.taoltech.emr.responses.ErrResponse;
 import com.taoltech.emr.responses.OkResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
-import jakarta.websocket.server.PathParam;
 
 import java.util.*;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
@@ -48,6 +43,9 @@ public class PatientController {
     
     @Autowired
     private ObjectMapper mapper;
+
+    @Autowired
+    private PasswordEncoder encoder;
 
     @Autowired
     private PatientRepository repository;
@@ -111,6 +109,34 @@ public class PatientController {
 
     @Operation(
         tags = "Patient",
+        summary = "Search for a Patient",
+        security = {
+            @SecurityRequirement(name = EmrApplication.AUTH)
+        }
+    )
+    @GetMapping("/search/{param}")
+    public ResponseEntity<?> searchPatient(@PathVariable String param) {   
+        
+        // Get Model
+        Patient patient = repository.findBySn(param).orElse(null);
+        if(patient == null) { // Search by Phone number or Email
+            User user = userRepository.findByPhoneOrEmail(param, param).orElseThrow();
+            
+            // Found
+            patient = repository.findByUser(user).get();
+        }
+
+        //
+        Map<String, Object> data = new HashMap();
+        data.put("patient", patient);
+
+        //
+        return ResponseEntity.ok().body(new OkResponse("Patient found", data));
+    }
+
+
+    @Operation(
+        tags = "Patient",
         summary = "Add a new Patient",
         security = {
             @SecurityRequirement(name = EmrApplication.AUTH)
@@ -126,14 +152,18 @@ public class PatientController {
         // Create User Model
         User user = body.toUser();
         user.setRole(role);
+        user.setPassword(encoder.encode(user.getPassword()));
         user = userRepository.save(user);
 
         // Create Model
+        long patientCount = repository.count();
+
         Patient patient = new Patient();
         patient.setUser(user);
         patient.setDob(body.getDob());
         patient.setGender(body.getGender());
         patient.setAddress(body.getAddress());
+        patient.setSn("PAT" + (patientCount + 1));
 
         patient = repository.save(patient);
 
